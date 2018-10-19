@@ -53,13 +53,14 @@ public class RSALibrary {
 	  // ...
       
       FileOutputStream keyfos = new FileOutputStream(PUBLIC_KEY_FILE);
-      keyfos.write(keyPair.getPublic().getEncoded());
-      keyfos.close();
+      ObjectOutputStream oos = new ObjectOutputStream(keyfos);
+      oos.writeObject(keyPair.getPublic());
+      oos.close();
       
 	  // TO-DO: store the private key in the file PRIVATE_KEY_FILE
 	  // ...
       
-      FileOutputStream keyfos2 = new FileOutputStream("PRIVATE_KEY_FILE");
+      FileOutputStream keyfos2 = new FileOutputStream(PRIVATE_KEY_FILE);
       keyfos2.write(keyPair.getPrivate().getEncoded());
       keyfos2.close();
 
@@ -88,7 +89,7 @@ public class RSALibrary {
 	  // ...
       
       cipher.init(Cipher.ENCRYPT_MODE, key);
-      byte[] ciphered = cipher.doFinal(plaintext);
+      ciphertext = cipher.doFinal(plaintext);
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -176,7 +177,6 @@ public class RSALibrary {
 
 	  // TO-DO: initialize the signature oject with the public key
 	  // ...
-     SecureRandom secureRandom = new SecureRandom();
      signature.initVerify(key);
      
 	  // TO-DO: set plaintext as the bytes to be veryfied

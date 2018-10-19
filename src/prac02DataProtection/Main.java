@@ -2,10 +2,10 @@ package prac02DataProtection;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.io.ObjectInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -15,7 +15,7 @@ public class Main {
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		RSALibrary rsaLibrary = new RSALibrary();
-		String plainText = "hola";
+		String plainText = "modsfinosadvnoaknvoanpvaenrivrenaǜoinoaspndviojadsnpaskdnvlñsaknvñosdivnokasñboaniorenbijunvrijefvnksjdvnkdjvkdjviejr";
 		//String to hold the name of the private key file.
 		final String PRIVATE_KEY_FILE = "./private.key";
 
@@ -25,23 +25,16 @@ public class Main {
 		
 		try {
 			rsaLibrary.generateKeys();
-			
-			FileInputStream keyfis = new FileInputStream(PUBLIC_KEY_FILE);
-			byte[] encKey = new byte[keyfis.available()];  
-			keyfis.read(encKey);
-			
-			FileInputStream keyfis2 = new FileInputStream(PRIVATE_KEY_FILE);
-			byte[] encKey2 = new byte[keyfis2.available()];  
-			keyfis2.read(encKey2);
-			
-			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(encKey);
+
+			byte[] privateKeyBytes = Files.readAllBytes(Paths.get(PRIVATE_KEY_FILE));
+
 			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-			PublicKey publicKey = keyFactory.generatePublic(pubKeySpec);
+			PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+
+			FileInputStream filePublicKey = new FileInputStream(PUBLIC_KEY_FILE);
+			ObjectInputStream oisPublicKey = new ObjectInputStream(filePublicKey);
+			PublicKey publicKey = (PublicKey) oisPublicKey.readObject();
 			System.out.println(publicKey);
-			
-			PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(encKey2);
-			KeyFactory keyFactory2 = KeyFactory.getInstance("RSA");
-			PrivateKey privateKey = keyFactory.generatePrivate(spec);
 			
 			byte[] signature = rsaLibrary.sign(plainText.getBytes("UTF-8"), privateKey);
 			System.out.println("Firma:");
@@ -53,10 +46,13 @@ public class Main {
 			System.out.println(verified);
 			
 			byte[] cipher = rsaLibrary.encrypt(plainText.getBytes("UTF-8"), publicKey);
-			System.out.println(cipher);
+			System.out.println(new String(cipher));
+
+			byte[] newPlainText = rsaLibrary.decrypt(cipher, privateKey);
+			System.out.println(new String(newPlainText));
+
 			
-			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

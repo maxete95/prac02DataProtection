@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="prac02DataProtection:jar">
+    <output-path>$PROJECT_DIR$/classes/artifacts/prac02DataProtection_jar</output-path>
+    <root id="archive" name="prac02DataProtection.jar">
+      <element id="module-output" name="prac02DataProtection" />
+    </root>
+  </artifact>
+</component>
